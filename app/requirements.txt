@@ -1,0 +1,7 @@
+fastapi==0.115.14
+uvicorn==0.34.3
+pymorphy2==0.9.1
+presidio_analyzer==2.2.358
+presidio_anonymizer==2.2.358
+hydra-core==1.3.2
+python-dotenv==1.1.1
