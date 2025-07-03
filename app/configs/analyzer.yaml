@@ -5,6 +5,11 @@ analyzer:
     _target_: presidio_analyzer.RecognizerRegistry
     recognizers:
       - _target_: services.recognizers.inn_recognizer.INNRecognizer
+      - _target_: services.recognizers.vocab_recognizer.VocabularyBasedRecognizer
+        path_to_vocabularies:
+          NAME: "data/names.txt"
+          SURNAME: "data/surnames.txt"
+          MIDNAME: "data/midnames.txt"
       - _target_: presidio_analyzer.predefined_recognizers.EmailRecognizer
         supported_language: ru
       - _target_: presidio_analyzer.predefined_recognizers.PhoneRecognizer

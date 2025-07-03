@@ -35,11 +35,11 @@ class PresidioMasker(BaseMasker):
     def mask(self, text: str) -> MaskedOutput:
         results = self.analyzer.analyze(text, language="ru")
 
-        results = self._postprocess_recognizer_results(results)
-
         results = self.anonymizer._remove_conflicts_and_get_text_manipulation_data(
             analyzer_results=results, conflict_resolution=ConflictResolutionStrategy.MERGE_SIMILAR_OR_CONTAINED
         )
+
+        results = self._postprocess_recognizer_results(results)
 
         mask_mapping = self._get_mask_mapping(text, results)
         anonymizer_result = self.anonymizer.anonymize(text, analyzer_results=results)

@@ -39,7 +39,7 @@ class VocabularyBasedRecognizer(EntityRecognizer):
         for token in tokens:
             parsed_token = self.morph.parse(token)[0]
 
-            for entity in entities:
+            for entity in self.vocab.keys():
                 if token in self.vocab[entity] and parsed_token.tag.POS == "NOUN":
                     textual_explanation = f"Found word {token} in vocabulary {entity}"
 

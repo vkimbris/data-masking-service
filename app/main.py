@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 
 from services import BaseMasker
-from models.masking import MaskingRequest, MaskingResponse, DeMaskingRequest, DeMaskingResponse
+from models.masking import MaskingRequest, MaskingResponse
 
 from dependencies import get_masker
 
