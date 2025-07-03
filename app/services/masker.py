@@ -20,10 +20,6 @@ class BaseMasker(ABC):
     def mask(self, text: str) -> MaskedOutput:
         pass
 
-    @abstractmethod
-    def de_mask(self, text: str, entities: dict[str, str]) -> str:
-        pass
-
 
 class PresidioMasker(BaseMasker):
 
@@ -33,7 +29,7 @@ class PresidioMasker(BaseMasker):
         self.anonymizer = AnonymizerEngine()
 
     def mask(self, text: str) -> MaskedOutput:
-        results = self.analyzer.analyze(text, language="ru")
+        results = self.analyzer.analyze(text, language="ru", entities=self.entities)
 
         results = self.anonymizer._remove_conflicts_and_get_text_manipulation_data(
             analyzer_results=results, conflict_resolution=ConflictResolutionStrategy.MERGE_SIMILAR_OR_CONTAINED
