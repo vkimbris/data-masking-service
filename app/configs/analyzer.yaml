@@ -1,0 +1,24 @@
+analyzer:
+  _target_: presidio_analyzer.AnalyzerEngine
+
+  registry:
+    _target_: presidio_analyzer.RecognizerRegistry
+    recognizers:
+      - _target_: services.recognizers.inn_recognizer.INNRecognizer
+      - _target_: services.recognizers.vocab_recognizer.VocabularyBasedRecognizer
+        path_to_vocabularies:
+          NAME: "data/names.txt"
+          SURNAME: "data/surnames.txt"
+          MIDNAME: "data/midnames.txt"
+      - _target_: presidio_analyzer.predefined_recognizers.EmailRecognizer
+        supported_language: ru
+      - _target_: presidio_analyzer.predefined_recognizers.PhoneRecognizer
+        supported_language: ru
+        supported_regions:
+          - "RU"
+
+  nlp_engine:
+    _target_: presidio_analyzer.nlp_engine.SpacyNlpEngine
+    models:
+      - lang_code: ru
+        model_name: ru_core_news_lg
