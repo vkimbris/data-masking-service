@@ -3,7 +3,7 @@ import pymorphy2.tokenizers
 
 from presidio_analyzer.nlp_engine import NlpArtifacts
 from presidio_analyzer import EntityRecognizer, RecognizerResult, AnalysisExplanation
-from typing import List, Dict, Callable
+from typing import List, Dict
 
 
 class VocabularyBasedRecognizer(EntityRecognizer):
@@ -57,7 +57,7 @@ class VocabularyBasedRecognizer(EntityRecognizer):
                 else:
                     lemma = parsed_token.normal_form
 
-                    if lemma in self.vocab[entity] and parsed_token.tag.POS == "NOUN":
+                    if lemma in self.vocab[entity] and parsed_token.tag.POS == "NOUN" and parsed_token.score >= 0.5:
                         textual_explanation = f"Found lemma {lemma} in vocabulary {entity}"
 
                         start, end = self._get_start_end_indexes(text, token)
