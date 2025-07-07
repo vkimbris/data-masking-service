@@ -1,14 +1,16 @@
-from fastapi import FastAPI, Depends
+from logging_config import setup_logging
+setup_logging()
 
+from middleware import log_requests_response
+from dependencies import get_masker
+from fastapi import FastAPI, Depends, HTTPException
 from services import BaseMasker
 from models.masking import MaskingRequest, MaskingResponse
-
-from dependencies import get_masker
-
 from typing import List
 
 
 app = FastAPI()
+app.middleware("http")(log_requests_response)
 
 
 @app.get("/")
@@ -22,10 +24,14 @@ async def mask(
     masker: BaseMasker = Depends(get_masker)
 ) -> List[MaskingResponse]:
 
-    masking_responses: list[MaskingResponse] = []
-    for text in masking_request.texts:
-        masked_output = masker.mask(text)
+    try:
+        masking_responses: list[MaskingResponse] = []
+        for text in masking_request.texts:
+            masked_output = masker.mask(text)
 
-        masking_responses.append(MaskingResponse(masked_text=masked_output.masked_text, mask_mapping=masked_output.mask_mapping))
+            masking_responses.append(MaskingResponse(masked_text=masked_output.masked_text, mask_mapping=masked_output.mask_mapping))
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
     return masking_responses
