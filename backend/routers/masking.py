@@ -1,24 +1,16 @@
-from logging_config import setup_logging
-setup_logging()
+from fastapi import APIRouter, Depends, HTTPException
 
-from middleware import log_requests_response
-from dependencies import get_masker
-from fastapi import FastAPI, Depends, HTTPException
-from services import BaseMasker
 from models.masking import MaskingRequest, MaskingResponse
+from services import BaseMasker
+from dependencies import get_masker
+
 from typing import List
 
 
-app = FastAPI()
-app.middleware("http")(log_requests_response)
+router = APIRouter(tags=["Masking"])
 
 
-@app.get("/")
-async def root():
-    return "Hello world!"
-
-
-@app.post("/mask")
+@router.post("/mask")
 async def mask(
     masking_request: MaskingRequest,
     masker: BaseMasker = Depends(get_masker)
@@ -35,3 +27,9 @@ async def mask(
         raise HTTPException(status_code=500, detail=str(e))
 
     return masking_responses
+
+@router.post("/de_mask")
+async def de_mask(
+    masker: BaseMasker = Depends(get_masker)
+) -> List[MaskingResponse]:
+    pass

@@ -6,6 +6,7 @@ from pathlib import Path
 LOG_DIR = Path(os.getenv("LOG_PATH", "logs")).resolve()
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
+
 LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": True,

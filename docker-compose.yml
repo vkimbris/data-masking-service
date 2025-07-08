@@ -1,13 +1,19 @@
 services:
-  app:
+  backend:
     build:
-      context: ./app
+      context: ./backend
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     env_file:
-      - app/.env
+      - backend/.env
     environment:
-      - LOG_PATH=/app/logs/
+      - LOG_PATH=/backend/logs/
     volumes:
-      - ./app/logs:/app/logs
+      - ./backend/logs:/backend/logs
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"

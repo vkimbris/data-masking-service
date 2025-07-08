@@ -5,4 +5,5 @@ presidio_analyzer==2.2.358
 presidio_anonymizer==2.2.358
 hydra-core==1.3.2
 python-dotenv==1.1.1
+python-multipart==0.0.20
 boto3==1.39.1

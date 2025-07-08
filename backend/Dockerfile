@@ -1,6 +1,6 @@
 FROM python:3.10-slim
 
-WORKDIR /app
+WORKDIR /backend
 
 COPY requirements.txt .
 
@@ -10,7 +10,7 @@ RUN python -m spacy download ru_core_news_lg
 
 RUN pip install --no-cache-dir awscli
 
-RUN mkdir -p /app/data
+RUN mkdir -p /backend/data
 
 COPY . .
 
