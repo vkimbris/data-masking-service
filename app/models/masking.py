@@ -9,3 +9,11 @@ class MaskingRequest(BaseModel):
 class MaskingResponse(BaseModel):
     masked_text: str
     mask_mapping: Dict[str, str]
+
+
+class DeMaskingRequest(BaseModel):
+    inputs: List[MaskingResponse]
+
+
+class DeMaskingResponse(BaseModel):
+    de_masked_texts: List[str]

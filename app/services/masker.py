@@ -20,6 +20,9 @@ class BaseMasker(ABC):
     def mask(self, text: str) -> MaskedOutput:
         pass
 
+    @abstractmethod
+    def de_mask(self, text: str, entities: dict[str, str]) -> str:
+        pass
 
 class PresidioMasker(BaseMasker):
 

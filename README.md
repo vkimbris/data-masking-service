@@ -22,8 +22,7 @@ AWS_SECRET_ACCESS_KEY=
 AWS_ENDPOINTURL=
 ```  
 
-- Собрать приложение `docker build -t masking:latest .` 
-- Запустить `docker run --env-file .env -d -p 8000:8000 --name masking masking:latest `
+- Собрать и запустить приложение `docker-compose up --build` 
 
 # API
 

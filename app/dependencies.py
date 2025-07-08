@@ -14,8 +14,6 @@ from services import BaseMasker
 def get_masker() -> BaseMasker:
     masker_type = os.getenv("MASKER_TYPE")
 
-    print("Masker type: ", masker_type)
-
     if masker_type is None:
         raise ValueError("MASKER_TYPE environment variable is not set")
 
