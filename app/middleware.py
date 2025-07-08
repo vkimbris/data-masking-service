@@ -38,7 +38,7 @@ async def log_requests_response(request: Request, call_next):
         },
         "response": response_body
     }
-    request_to_response_json = json.dumps(request_to_response_json)
+    request_to_response_json = json.dumps(request_to_response_json, ensure_ascii=False)
 
     logger.info('%s:%d - "%s %s HTTP/1.1" %s - %d',
                 client_host, client_port, method, path, request_to_response_json, response_status_code)
