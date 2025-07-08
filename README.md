@@ -52,3 +52,25 @@ AWS_ENDPOINTURL=
   }
 ]
 ```
+### 2. **`/de_mask`** (POST)
+- **Request body**:
+```json
+{
+  "inputs": [
+    {
+      "masked_text": "<NAME_0>, привет!",
+      "mask_mapping": {
+        "<NAME_0>": "Владимир"
+      }
+    }
+  ]
+}
+```
+- **Response**:
+```json
+{
+  "de_masked_texts": [
+    "Владимир, привет!"
+  ]
+}
+```
