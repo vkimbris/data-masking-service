@@ -35,42 +35,37 @@ class VocabularyBasedRecognizer(EntityRecognizer):
 
         tokens = pymorphy2.tokenizers.simple_word_tokenize(text)
 
-        results: list[RecognizerResult] = []
+        results = []
+        search_pos = 0
+
         for token in tokens:
-            parsed_token = self.morph.parse(token)[0]
+            parsed = self.morph.parse(token)[0]
+            start = text.find(token, search_pos)
 
-            for entity in self.vocab.keys():
-                if token in self.vocab[entity] and parsed_token.tag.POS == "NOUN":
-                    textual_explanation = f"Found word {token} in vocabulary {entity}"
+            if start == -1:
+                continue
 
-                    start, end = self._get_start_end_indexes(text, token)
+            end = start + len(token)
+            search_pos = end
+
+            for entity in self.vocab:
+                if parsed.tag.POS == "NOUN" and (
+                        token.lower() in self.vocab[entity]
+                        or parsed.normal_form in self.vocab[entity] and parsed.score >= 0.5
+                ):
+                    explanation = (f"Found {'lemma' if parsed.normal_form in self.vocab[entity] else 'word'} "
+                                   f"{parsed.normal_form if parsed.normal_form in self.vocab[entity] else token} "
+                                   f"in vocabulary {entity}")
 
                     results.append(RecognizerResult(
-                        start=start,
-                        end=end,
-                        entity_type=entity,
+                        start=start, end=end, entity_type=entity,
                         score=self.score,
                         analysis_explanation=AnalysisExplanation(
-                            recognizer=self.name, textual_explanation=textual_explanation, original_score=self.score
+                            recognizer=self.name,
+                            textual_explanation=explanation,
+                            original_score=self.score
                         )
                     ))
-                else:
-                    lemma = parsed_token.normal_form
-
-                    if lemma in self.vocab[entity] and parsed_token.tag.POS == "NOUN" and parsed_token.score >= 0.5:
-                        textual_explanation = f"Found lemma {lemma} in vocabulary {entity}"
-
-                        start, end = self._get_start_end_indexes(text, token)
-
-                        results.append(RecognizerResult(
-                            start=start,
-                            end=end,
-                            entity_type=entity,
-                            score=self.score,
-                            analysis_explanation=AnalysisExplanation(
-                                recognizer=self.name, textual_explanation=textual_explanation, original_score=self.score
-                            )
-                        ))
 
         return results
 
@@ -82,14 +77,3 @@ class VocabularyBasedRecognizer(EntityRecognizer):
             vocab = list(map(lambda x: x.strip().lower(), vocab))
 
         return set(vocab)
-
-    @staticmethod
-    def _get_start_end_indexes(text: str, word: str) -> tuple[int]:
-        start = text.find(word)
-
-        if start == -1:
-            raise ValueError(f"Can't find substring {word} in string.")
-
-        end = start + len(word)
-
-        return start, end

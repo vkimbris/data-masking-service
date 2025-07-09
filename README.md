@@ -30,47 +30,49 @@ AWS_ENDPOINTURL=
 - **Request body**:
 ```json
 {
-  "texts": ["телефон - +79211234556", "имя - иван альбертович парфенов"]
+  "input": {
+    "key1": "Меня зовут Владимир!",
+    "key2": "Привет, Владимир!",
+    "key3": "Мой телефон:",
+    "key4": "89071511756",
+    "key5": "Ваш телефон 89071511756 получен!"
+  }
 }
 ```
 - **Response**:
 ```json
-[
-  {
-    "masked_text": "телефон - <PHONE_NUMBER_0>",
-    "mask_mapping": {
-      "<PHONE_NUMBER_0>": "+79211234556"
-    }
+{
+  "metadata": {
+    "<PHONE_NUMBER_0>": "89071511756",
+    "<NAME_0>": "Владимир"
   },
-  {
-    "masked_text": "имя - <NAME_0> <MIDNAME_0> <SURNAME_0>",
-    "mask_mapping": {
-      "<NAME_0>": "иван",
-      "<SURNAME_0>": "парфенов",
-      "<MIDNAME_0>": "альбертович"
-    }
+  "output": {
+    "key1": "Меня зовут <NAME_0>!",
+    "key2": "Привет, <NAME_0>!",
+    "key3": "Пополните баланс моего телефона:",
+    "key4": "<PHONE_NUMBER_0>",
+    "key5": "Ваш телефон <PHONE_NUMBER_0> получен!"
   }
-]
+}
 ```
-### 2. **`/de_mask`** (POST)
+### 2. **`/demask`** (POST)
 - **Request body**:
 ```json
 {
-  "inputs": [
-    {
-      "masked_text": "<NAME_0>, привет!",
-      "mask_mapping": {
-        "<NAME_0>": "Владимир"
-      }
-    }
-  ]
+  "metadata": {
+    "<PHONE_NUMBER_0>": "89071511756",
+    "<NAME_0>": "Владимир"
+  },
+  "input": {
+    "anotherKey1": "<NAME_0>, баланс вашего телефона <PHONE_NUMBER_0> успешно пополнен!"
+  }
 }
 ```
 - **Response**:
 ```json
 {
-  "de_masked_texts": [
-    "Владимир, привет!"
-  ]
+  "output": {
+    "anotherKey1": "Владимир, баланс вашего телефона 89071511756 успешно пополнен!"
+  }
 }
 ```

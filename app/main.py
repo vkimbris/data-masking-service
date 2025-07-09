@@ -2,6 +2,7 @@ from logging_config import setup_logging
 setup_logging()
 
 import logging
+import json
 
 from middleware import log_requests_response
 from dependencies import get_masker
@@ -10,7 +11,6 @@ from fastapi.responses import JSONResponse
 from services import BaseMasker
 from contextlib import asynccontextmanager
 from models.masking import MaskingRequest, MaskingResponse, DeMaskingRequest, DeMaskingResponse
-from typing import List
 
 
 logger = logging.getLogger("custom-logger")
@@ -48,35 +48,32 @@ async def root():
 async def mask(
     masking_request: MaskingRequest,
     masker: BaseMasker = Depends(get_masker)
-) -> List[MaskingResponse]:
+) -> MaskingResponse:
 
     try:
-        masking_responses: list[MaskingResponse] = []
-        for text in masking_request.texts:
-            masked_output = masker.mask(text)
+        masked_output = masker.mask(json.dumps(masking_request.input, ensure_ascii=False))
 
-            masking_responses.append(MaskingResponse(masked_text=masked_output.masked_text, mask_mapping=masked_output.mask_mapping))
+        return MaskingResponse(
+            metadata=masked_output.mask_mapping,
+            output=json.loads(masked_output.masked_text),
+        )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    return masking_responses
-
-@app.post("/de_mask")
-async def de_mask(
-    de_masking_request: DeMaskingRequest,
+@app.post("/demask")
+async def demask(
+    demasking_request: DeMaskingRequest,
     masker: BaseMasker = Depends(get_masker)
 ) -> DeMaskingResponse:
 
     try:
-        de_masked_texts: list[str] = []
+        output: dict[str, str] = {}
 
-        for inp in de_masking_request.inputs:
-            de_masked_text = masker.de_mask(text=inp.masked_text, entities=inp.mask_mapping)
+        for key, value in demasking_request.input.items():
+            output[key] = masker.demask(value, demasking_request.metadata)
 
-            de_masked_texts.append(de_masked_text)
-
-        return DeMaskingResponse(de_masked_texts=de_masked_texts)
+        return DeMaskingResponse(output=output)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
