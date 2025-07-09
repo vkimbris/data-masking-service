@@ -1,19 +1,20 @@
 from pydantic import BaseModel
-from typing import Dict, List
+from typing import Dict, List, Any
 
 
 class MaskingRequest(BaseModel):
-    texts: List[str]
+    input: Dict[str, str]
 
 
 class MaskingResponse(BaseModel):
-    masked_text: str
-    mask_mapping: Dict[str, str]
+    metadata: Dict[str, str]
+    output: Dict[str, str]
 
 
 class DeMaskingRequest(BaseModel):
-    inputs: List[MaskingResponse]
+    metadata: Dict[str, str]
+    input: Dict[str, str]
 
 
 class DeMaskingResponse(BaseModel):
-    de_masked_texts: List[str]
+    output: Dict[str, str]
