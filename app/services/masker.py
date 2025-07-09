@@ -21,7 +21,7 @@ class BaseMasker(ABC):
         pass
 
     @abstractmethod
-    def de_mask(self, text: str, entities: dict[str, str]) -> str:
+    def demask(self, text: str, entities: dict[str, str]) -> str:
         pass
 
 class PresidioMasker(BaseMasker):
@@ -38,38 +38,45 @@ class PresidioMasker(BaseMasker):
             analyzer_results=results, conflict_resolution=ConflictResolutionStrategy.MERGE_SIMILAR_OR_CONTAINED
         )
 
-        results = self._postprocess_recognizer_results(results)
+        results = self._enumerate_recognizer_results(text, results)
 
         mask_mapping = self._get_mask_mapping(text, results)
         anonymizer_result = self.anonymizer.anonymize(text, analyzer_results=results)
 
         return MaskedOutput(masked_text=anonymizer_result.text, mask_mapping=mask_mapping)
 
-    def de_mask(self, text: str, entities: dict[str, str]) -> str:
+    def demask(self, text: str, entities: dict[str, str]) -> str:
         for token, value in entities.items():
             text = text.replace(token, value)
 
         return text
 
-    def _postprocess_recognizer_results(self, results: list[RecognizerResult]) -> list[RecognizerResult]:
-        postprocessed_analyzer_result: list[RecognizerResult] = []
+    def _enumerate_recognizer_results(self, text: str, results: list[RecognizerResult]) -> list[RecognizerResult]:
+        enumerated_analyzer_result: list[RecognizerResult] = []
 
         for ent in self.entities:
             results_per_ent = [res for res in results if res.entity_type == ent]
             results_per_ent.sort(key=lambda x: x.start)
 
-            postprocessed_analyzer_result.extend(
-                [
+            enumerated_analyzer_result_per_ent = []
+
+            unique_values: dict[str, int] = {}
+            for k, res in enumerate(results_per_ent):
+                value = text[res.start : res.end]
+
+                if value not in unique_values:
+                    unique_values[value] = k
+
+                enumerated_analyzer_result_per_ent.append(
                     RecognizerResult(
-                        entity_type=res.entity_type + "_" + str(k),
+                        entity_type=res.entity_type + "_" + str(unique_values[value]),
                         start=res.start, end=res.end, score=res.score
                     )
+                )
 
-                    for k, res in enumerate(results_per_ent)
-                ]
-            )
+            enumerated_analyzer_result.extend(enumerated_analyzer_result_per_ent)
 
-        return postprocessed_analyzer_result
+        return enumerated_analyzer_result
 
     @staticmethod
     def _get_mask_mapping(text: str, results: list[RecognizerResult]) -> dict[str, str]:
